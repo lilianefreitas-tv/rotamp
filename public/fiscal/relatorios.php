@@ -121,6 +121,7 @@ $total_viagens = count($solicitacoes);
                     <option value="pendente" <?php if ($_GET['status'] ?? '' == 'pendente') echo 'selected'; ?>>Pendente</option>
                     <option value="em andamento" <?php if ($_GET['status'] ?? '' == 'em andamento') echo 'selected'; ?>>Em Andamento</option>
                     <option value="finalizado" <?php if ($_GET['status'] ?? '' == 'finalizado') echo 'selected'; ?>>Finalizado</option>
+                    <option value="cancelado" <?php if ($_GET['status'] ?? '' == 'cancelado') echo 'selected'; ?>>Cancelado</option>
                 </select>
             </div>
             <div class="col-md-2">

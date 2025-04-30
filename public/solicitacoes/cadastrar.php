@@ -32,23 +32,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($descricao) || empty($data_ida) || empty($data_volta) || empty($hora_saida) || empty($hora_chegada) || empty($origem) || empty($destino) || empty($motorista_id)) {
         $erro = "Preencha todos os campos.";
     } else {
-        // Verificação de conflito de agenda do motorista
+        // Montar datetime completo
+        $saida_inicio = $data_ida . ' ' . $hora_saida;
+        $chegada_fim = $data_volta . ' ' . $hora_chegada;
+
+        // Verificação de conflito de agenda do motorista (data + hora)
         $stmt = $pdo->prepare("
-            SELECT COUNT(*) FROM solicitacoes
-            WHERE motorista_id = :motorista_id
-              AND (
-                data_ida <= :data_volta
-                AND data_volta >= :data_ida
-              )
-        ");
+        SELECT COUNT(*) FROM solicitacoes
+        WHERE motorista_id = :motorista_id
+          AND status != 'cancelado'
+          AND (
+            (CONCAT(data_ida, ' ', hora_saida) < :chegada_fim)
+            AND (CONCAT(data_volta, ' ', hora_chegada) > :saida_inicio)
+          )
+    ");
         $stmt->bindParam(':motorista_id', $motorista_id);
-        $stmt->bindParam(':data_ida', $data_ida);
-        $stmt->bindParam(':data_volta', $data_volta);
+        $stmt->bindParam(':saida_inicio', $saida_inicio);
+        $stmt->bindParam(':chegada_fim', $chegada_fim);
         $stmt->execute();
         $conflito = $stmt->fetchColumn();
 
         if ($conflito > 0) {
-            $erro = "O motorista selecionado já possui agendamento neste período. Por favor, escolha outro horário ou motorista.";
+            $erro = "O motorista selecionado já possui agendamento nesse intervalo. Escolha outro horário ou motorista.";
         } else {
             // Inserir solicitação
             $stmt = $pdo->prepare("INSERT INTO solicitacoes (solicitante_id, motorista_id, descricao, data_ida, data_volta, hora_saida, hora_chegada, origem, destino, status) 
@@ -164,4 +169,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 <br>
 <?php include '../../includes/footer.php'; ?>
+
 </html>

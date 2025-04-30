@@ -28,11 +28,13 @@ $motorista_id = $motorista['id'];
 
 // Buscar viagens atribuídas a este motorista
 $stmt = $pdo->prepare("
-    SELECT s.*
+    SELECT s.*, u.nome AS solicitante_nome
     FROM solicitacoes s
+    JOIN usuarios u ON s.solicitante_id = u.id
     WHERE s.motorista_id = :motorista_id
     ORDER BY s.created_at DESC
 ");
+
 $stmt->bindParam(':motorista_id', $motorista_id);
 $stmt->execute();
 $viagens = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -63,6 +65,10 @@ $viagens = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <th>Origem</th>
                         <th>Destino</th>
                         <th>Data Ida</th>
+                        <th>Hora Saída</th>
+                        <th>Data Volta</th>
+                        <th>Hora Chegada</th>
+                        <th>Solicitante</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
@@ -73,6 +79,10 @@ $viagens = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?php echo htmlspecialchars($viagem['origem']); ?></td>
                             <td><?php echo htmlspecialchars($viagem['destino']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($viagem['data_ida'])); ?></td>
+                            <td><?php echo htmlspecialchars($viagem['hora_saida']); ?></td>
+                            <td><?php echo date('d/m/Y', strtotime($viagem['data_volta'])); ?></td>
+                            <td><?php echo htmlspecialchars($viagem['hora_chegada']); ?></td>
+                            <td><?php echo htmlspecialchars($viagem['solicitante_nome']); ?></td>
                             <td>
                                 <?php
                                 $badgeClass = match ($viagem['status']) {
