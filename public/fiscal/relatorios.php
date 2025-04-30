@@ -142,7 +142,7 @@ $total_viagens = count($solicitacoes);
     <div class="relatorio-header">
         <div class="relatorio-logo">
             <!-- Coloque sua imagem de logo aqui -->
-            <img src="../../assets/img/logo-mppa.png" alt="Logo MPPA">
+            <img src="../../assets/img/logo-mppa2.png" alt="Logo MPPA">
 
         </div>
         <h4>Ministério Público do Estado do Pará<br>Polo Regional de Altamira</h4>
