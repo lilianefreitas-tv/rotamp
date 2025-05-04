@@ -1,11 +1,13 @@
 <?php
 session_start();
+
+// Verifica se o usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: ../login.php");
     exit;
 }
 
-// Verificar se é fiscal
+// Verifica se é fiscal
 if ($_SESSION['usuario_tipo'] !== 'fiscal') {
     echo "Acesso não autorizado.";
     exit;
@@ -13,27 +15,38 @@ if ($_SESSION['usuario_tipo'] !== 'fiscal') {
 
 require_once '../../includes/conexao.php';
 
+// Variáveis para feedback
+$mensagem = '';
+$erro = '';
+
 // Processar assinatura se enviado via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprovante_id'])) {
     $comprovante_id = intval($_POST['comprovante_id']);
 
-    try {
-        $pdo->beginTransaction();
+    // Garantir que a sessão está válida
+    if (!isset($_SESSION['usuario_id']) || empty($_SESSION['usuario_id'])) {
+        $erro = "Usuário não autenticado para assinatura.";
+    } else {
+        try {
+            $pdo->beginTransaction();
 
-        // Atualizar assinatura do fiscal
-        $stmt = $pdo->prepare("
-            UPDATE comprovantes
-            SET assinado_fiscal = TRUE, data_assinatura_fiscal = NOW()
-            WHERE id = :id
-        ");
-        $stmt->bindParam(':id', $comprovante_id);
-        $stmt->execute();
+            $stmt = $pdo->prepare("
+                UPDATE comprovantes
+                SET assinado_fiscal = TRUE, 
+                    data_assinatura_fiscal = NOW(),
+                    id_fiscal_assinou = :uid
+                WHERE id = :id
+            ");
+            $stmt->bindParam(':uid', $_SESSION['usuario_id']);
+            $stmt->bindParam(':id', $comprovante_id);
+            $stmt->execute();
 
-        $pdo->commit();
-        $mensagem = "Comprovante assinado com sucesso!";
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        $erro = "Erro ao assinar comprovante: " . $e->getMessage();
+            $pdo->commit();
+            $mensagem = "Comprovante assinado com sucesso!";
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $erro = "Erro ao assinar comprovante: " . $e->getMessage();
+        }
     }
 }
 
