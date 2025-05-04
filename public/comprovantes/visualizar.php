@@ -14,9 +14,11 @@ if (!isset($_GET['id'])) {
 
 $solicitacao_id = intval($_GET['id']);
 
+
+
 // Processar assinatura
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['assinar'])) {
-    $usuario_tipo = $_SESSION['usuario_tipo'];
+    $usuario_tipo = strtolower(trim($_SESSION['usuario_tipo']));
     $usuario_id = $_SESSION['usuario_id'];
 
     try {
@@ -41,6 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['assinar'])) {
         $erro = "Erro ao registrar assinatura: " . $e->getMessage();
     }
 }
+
+
 
 // Buscar comprovante com nomes de quem assinou
 $stmt = $pdo->prepare("
@@ -80,23 +84,67 @@ if (!$comprovante) {
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <title>Visualizar Comprovante - RotaMP</title>
     <link href="../../assets/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .assinaturas { margin-top: 20px; }
-        .assinaturas ul { list-style: none; padding: 0; }
-        .assinaturas li { margin-bottom: 5px; }
-        .relatorio-header { text-align: center; margin-bottom: 20px; }
-        .relatorio-logo img { max-height: 80px; margin-bottom: 10px; }
-        .relatorio-footer { text-align: center; font-size: 12px; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 10px; }
-        @media print { .no-print { display: none !important; } }
-        .linha-assinatura span { display: inline-block; margin-top: 40px; font-size: 14px; }
-        .print-only { display: none; }
-        @media print { .print-only { display: block !important; } }
+        .assinaturas {
+            margin-top: 20px;
+        }
+
+        .assinaturas ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .assinaturas li {
+            margin-bottom: 5px;
+        }
+
+        .relatorio-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .relatorio-logo img {
+            max-height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .relatorio-footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 30px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .linha-assinatura span {
+            display: inline-block;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            .print-only {
+                display: block !important;
+            }
+        }
     </style>
 </head>
+
 <body class="bg-light">
     <div class="no-print">
         <?php include '../menu.php'; ?>
@@ -105,7 +153,7 @@ if (!$comprovante) {
     <div class="container mt-5">
         <div class="relatorio-header">
             <div class="relatorio-logo">
-                <img src="../../assets/img/logo-mppa.png" alt="Logo MPPA">
+                <img src="../../assets/img/logo-mppa2.png" alt="Logo MPPA">
             </div>
             <h4>Ministério Público do Estado do Pará<br>Polo Regional de Altamira</h4>
             <small>Comprovante de Circulação de Veículo</small>
@@ -116,17 +164,50 @@ if (!$comprovante) {
         <?php endif; ?>
 
         <table class="table table-bordered">
-            <tr><th>Solicitante</th><td><?php echo htmlspecialchars($comprovante['solicitante_nome']); ?></td></tr>
-            <tr><th>Motorista</th><td><?php echo htmlspecialchars($comprovante['motorista_nome']); ?></td></tr>
-            <tr><th>Veículo</th><td><?php echo htmlspecialchars($comprovante['modelo'] . ' - ' . $comprovante['placa']); ?></td></tr>
-            <tr><th>Origem</th><td><?php echo htmlspecialchars($comprovante['origem']); ?></td></tr>
-            <tr><th>Destino</th><td><?php echo htmlspecialchars($comprovante['destino']); ?></td></tr>
-            <tr><th>Data IDA/Hora Saída</th><td><?php echo date('d/m/Y H:i', strtotime($comprovante['hora_saida_real'])); ?></td></tr>
-            <tr><th>Data VOLTA/Hora Chegada</th><td><?php echo date('d/m/Y H:i', strtotime($comprovante['hora_chegada_real'])); ?></td></tr>
-            <tr><th>Odômetro Início</th><td><?php echo htmlspecialchars($comprovante['odometro_inicio']) . ' km'; ?></td></tr>
-            <tr><th>Odômetro Fim</th><td><?php echo htmlspecialchars($comprovante['odometro_fim']) . ' km'; ?></td></tr>
-            <tr><th>Km Rodado</th><td><?php echo htmlspecialchars($comprovante['km_rodado']) . ' km'; ?></td></tr>
-            <tr><th>Tempo de Operação</th><td><?php echo htmlspecialchars($comprovante['tempo_operacao']); ?></td></tr>
+            <tr>
+                <th>Solicitante</th>
+                <td><?php echo htmlspecialchars($comprovante['solicitante_nome']); ?></td>
+            </tr>
+            <tr>
+                <th>Motorista</th>
+                <td><?php echo htmlspecialchars($comprovante['motorista_nome']); ?></td>
+            </tr>
+            <tr>
+                <th>Veículo</th>
+                <td><?php echo htmlspecialchars($comprovante['modelo'] . ' - ' . $comprovante['placa']); ?></td>
+            </tr>
+            <tr>
+                <th>Origem</th>
+                <td><?php echo htmlspecialchars($comprovante['origem']); ?></td>
+            </tr>
+            <tr>
+                <th>Destino</th>
+                <td><?php echo htmlspecialchars($comprovante['destino']); ?></td>
+            </tr>
+            <tr>
+                <th>Data IDA/Hora Saída</th>
+                <td><?php echo date('d/m/Y H:i', strtotime($comprovante['hora_saida_real'])); ?></td>
+            </tr>
+            <tr>
+                <th>Data VOLTA/Hora Chegada</th>
+                <td><?php echo date('d/m/Y H:i', strtotime($comprovante['hora_chegada_real'])); ?></td>
+            </tr>
+            <tr>
+                <th>Odômetro Início</th>
+                <td><?php echo htmlspecialchars($comprovante['odometro_inicio']) . ' km'; ?></td>
+            </tr>
+            <tr>
+                <th>Odômetro Fim</th>
+                <td><?php echo htmlspecialchars($comprovante['odometro_fim']) . ' km'; ?></td>
+            </tr>
+            <tr>
+                <th>Km Rodado</th>
+                <td><?php echo htmlspecialchars($comprovante['km_rodado']) . ' km'; ?></td>
+            </tr>
+            <tr>
+                <th>Tempo de Operação</th>
+                <td><?php echo htmlspecialchars($comprovante['tempo_operacao']); ?></td>
+            </tr>
         </table>
 
         <div class="assinaturas">
@@ -189,4 +270,5 @@ if (!$comprovante) {
     <script src="../../assets/js/bootstrap.bundle.min.js"></script>
 </body>
 <?php include '../../includes/footer.php'; ?>
+
 </html>
