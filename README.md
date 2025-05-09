@@ -82,5 +82,5 @@ O sistema RotaMP é flexível, replicável e pode ser facilmente adaptado para o
 
 # Nota Técnica
 
-Este sistema foi desenvolvido por **Liliane de Freitas – Técnica em Tecnologia da Informação no MPPA**, com apoio de inteligência artificial como ferramenta de produtividade. A IA foi utilizada para auxílio na codificação, estruturação lógica, documentação técnica e boas práticas de desenvolvimento.
+Este sistema foi desenvolvido por **Liliane de Freitas – Técnica em Tecnologia da Informação no MPPA**.
 
